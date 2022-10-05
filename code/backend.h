@@ -6,6 +6,8 @@ namespace aquaback
 struct BackendData
 {
     mem::MemoryArena memory;
+
+    bool run = true;
 };
 
 BackendData* init(void* mem, mem_size size)
@@ -20,5 +22,21 @@ BackendData* init(void* mem, mem_size size)
     return data;
 }
 
+int run_threaded(void* threadData)
+{ 
+    BackendData* data = (BackendData*)threadData;
+
+    while(data->run)
+    {
+        SDL_Delay(50);
+    }
+
+    return 0;
+}
+
+void stop_thread(BackendData* data)
+{ 
+    data->run = false;
+}
 
 }

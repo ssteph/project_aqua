@@ -9,6 +9,7 @@
 
 #include "..\libs\SDL2-devel-2.24.0-VC\SDL2-2.24.0\include\SDL.h"
 #include "..\libs\SDL2-devel-2.24.0-VC\SDL2-2.24.0\include\SDL_opengl.h"
+#include "..\libs\SDL2-devel-2.24.0-VC\SDL2-2.24.0\include\SDL_thread.h"
 #include <GL/gl.h>
 
 #include "..\libs\dearimgui\imgui.h"
@@ -87,7 +88,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    aquaback::BackendData* backendData = aquaback::init(backendMem, backendMemorySize); (void*)backendData;
+    aquaback::BackendData* backendData = aquaback::init(backendMem, backendMemorySize);
+
+    SDL_Thread* backendThread = SDL_CreateThread(aquaback::run_threaded, "aquaback", (void*)backendData);
+
+    if(!backendThread)
+    {
+        LOG_ERROR("SDL_CreateThread");
+        return 1;
+    }
 
     //////////////////////////////////////////////////////////////////
     /// main loop
@@ -375,6 +384,9 @@ int main(int argc, char** argv)
         }
     }
 #endif 
+
+    aquaback::stop_thread(backendData);
+    SDL_WaitThread(backendThread, nullptr);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
