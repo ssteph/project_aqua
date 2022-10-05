@@ -18,4 +18,5 @@ typedef uint8_t u8;
 typedef float real32;
 typedef double real64;
 
-typedef u32 bool32;
+typedef u64 mem_size;
+typedef u8* mem_index;

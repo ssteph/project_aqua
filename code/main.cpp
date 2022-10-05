@@ -1,5 +1,7 @@
 #include "types.h"
+#include "debug.h"
 #include "log.h"
+#include "memory.h"
 
 #include <windows.h>
 #include <psapi.h>
@@ -53,14 +55,26 @@ int main(int argc, char** argv)
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
 
-    aquafront::init();
+    mem_size frontendMemorySize = 1024 * 1024 * 400;
+    void* frontendMemReservation = VirtualAlloc(0, frontendMemorySize, MEM_RESERVE, PAGE_READWRITE);
+    if(!frontendMemReservation)
+    {
+        LOG_ERROR("MEM_RESERVE");
+        return 1;
+    }
+
+    void* frontendMem = VirtualAlloc(frontendMemReservation, frontendMemorySize, MEM_COMMIT, PAGE_READWRITE);
+    if(frontendMem != frontendMemReservation)
+    {
+        LOG_ERROR("MEM_COMMIT");
+        return 1;
+    }
+
+    aquafront::FrontendData* frontendData = aquafront::init(frontendMem, frontendMemorySize);
     aquaback::init();
 
     bool running = 1;
     
-    bool someBoolean = false;
-    float someFloat = 0.0f;
-
     while(running)
     {
         SDL_Event sdlEvent;
@@ -91,7 +105,7 @@ int main(int argc, char** argv)
 
         /////////////////////////
 
-        aquafront::update(someBoolean, someFloat);
+        aquafront::update(frontendData);
 
         /////////////////////////
 
