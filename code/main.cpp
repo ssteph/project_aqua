@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
 
-    mem_size frontendMemorySize = 1024 * 1024 * 400;
+    mem_size frontendMemorySize = 1024 * 1024 * 100;
     void* frontendMemReservation = VirtualAlloc(0, frontendMemorySize, MEM_RESERVE, PAGE_READWRITE);
     if(!frontendMemReservation)
     {
@@ -71,10 +71,28 @@ int main(int argc, char** argv)
     }
 
     aquafront::FrontendData* frontendData = aquafront::init(frontendMem, frontendMemorySize);
-    aquaback::init();
+
+    mem_size backendMemorySize = 1024 * 1024 * 1024;
+    void* backendMemReservation = VirtualAlloc(0, backendMemorySize, MEM_RESERVE, PAGE_READWRITE);
+    if(!backendMemReservation)
+    {
+        LOG_ERROR("MEM_RESERVE");
+        return 1;
+    }
+
+    void* backendMem = VirtualAlloc(backendMemReservation, backendMemorySize, MEM_COMMIT, PAGE_READWRITE);
+    if(backendMem != backendMemReservation)
+    {
+        LOG_ERROR("MEM_COMMIT");
+        return 1;
+    }
+
+    aquaback::BackendData* backendData = aquaback::init(backendMem, backendMemorySize); (void*)backendData;
+
+    //////////////////////////////////////////////////////////////////
+    /// main loop
 
     bool running = 1;
-    
     while(running)
     {
         SDL_Event sdlEvent;
