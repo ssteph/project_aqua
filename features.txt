@@ -1,0 +1,4 @@
+nibbles (4bit)
+
+pointer backtrace
+

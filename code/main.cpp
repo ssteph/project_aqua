@@ -16,6 +16,7 @@
 #include "..\libs\dearimgui\backends\imgui_impl_sdl.h"
 #include "..\libs\dearimgui\backends\imgui_impl_opengl3.h"
 
+#include "command.h"
 #include "frontend.h"
 #include "backend.h"
 
